@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Node.js and npm (make sure Node.js version is compatible with your app)
+# Install Node.js and npm
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
 # Set working directory
@@ -35,7 +35,7 @@ RUN npm install && npm run build
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 8080 for Cloud Run
+# Expose port 8080
 EXPOSE 8080
 
 # Start PHP-FPM and Nginx
