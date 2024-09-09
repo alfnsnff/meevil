@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install Node.js and npm (make sure Node.js version is compatible with your app)
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
 # Copy Laravel project files
 COPY . .
