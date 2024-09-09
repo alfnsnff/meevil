@@ -31,8 +31,8 @@ jobs:
     # Build and push Docker image to Google Container Registry
     - name: Build and push to GCR
       run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/meevil .
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/meevil
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.event.repository.name }} .
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.event.repository.name }}
 
     # Deploy to Cloud Run
     - name: Deploy to Cloud Run
