@@ -42,3 +42,9 @@ jobs:
         --region ${{ secrets.GCP_REGION }} \
         --platform managed \
         --quiet
+
+    - name: IAM Policy Binding Setup
+        gcloud run services add-iam-policy-binding meevil \
+        --member="allUsers" \
+        --role="roles/run.invoker" \
+        --region [REGION]
