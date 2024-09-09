@@ -47,4 +47,4 @@ jobs:
         gcloud run services add-iam-policy-binding meevil \
         --member="allUsers" \
         --role="roles/run.invoker" \
-        --region [REGION]
+        --region ${{ secrets.GCP_REGION }}
