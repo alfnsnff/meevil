@@ -19,10 +19,9 @@ jobs:
 
     # Set up Google Cloud SDK
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/auth@v2.1.3
       with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
     # Authenticate Docker to use Google Cloud's container registry
     - name: Authenticate Docker
