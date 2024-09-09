@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +21,19 @@ Route::get('/dashboard', function () {
 Route::get('/home', function () {
     return Inertia::render('Home');
 })->middleware(['auth', 'verified'])->name('home');
+
+Route::get('/explore', function () {
+    return Inertia::render('Explore');
+})->middleware(['auth', 'verified'])->name('Explore');
+
+Route::get('/favorites', function () {
+    return Inertia::render('favorite');
+})->middleware(['auth', 'verified'])->name('Favorites');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/post', [PostController::class, 'index'])->name('post.index'); // Adjust as needed
+    Route::post('/post', [PostController::class, 'store'])->name('post.store'); // Route for creating a post
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

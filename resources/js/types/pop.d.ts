@@ -1,12 +1,6 @@
-export interface Pop {
-    id: number;
-    tweet: string;
-    file?: string;
-    is_fav: boolean;
-    user: {
-      id: number;
-      name: string;
-      handle: string;
-      avatar: string;
-    };
-  }
+export interface Post {
+  updated_at: string;
+  name: string;
+  handle: string;
+  content: string;
+}

@@ -10,4 +10,12 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        proxy: {
+          '/api': 'http://localhost', // Adjust if your Laravel server runs on a different port
+        },
+      },
+      build: {
+        outDir: 'public/build', // Output directory for built assets
+      },
 });

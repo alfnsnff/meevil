@@ -1,15 +1,50 @@
-// pages/index.tsx
-import Layout from '../Layouts/Layout';
+import React, { useState, useEffect, useRef, FormEventHandler } from 'react';
+import Layout from '../Layouts/MainLayout';
 import { Button } from '@/components/ui/button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPhotoFilm, faEllipsis, faBookmark, faHeart, faShareFromSquare } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPhotoFilm, faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import { format } from 'date-fns'; // Importing the format function from date-fns
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { useEffect, useRef } from 'react';
+import { Head, useForm } from '@inertiajs/react';
+import { PageProps } from '@/types';
 
-const HomePage: React.FC = () => {
+interface Post {
+  updated_at: string;
+  name: string;
+  handle: string;
+  content: string;
+}
 
+export default function HomePage({ auth }: PageProps) {
+  const [posts, setPosts] = useState<Post[]>([]); // Define posts with the Post interface
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    // Fetch posts from the API
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('/post', {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          },
+          credentials: 'include', // Include cookies (for authentication)
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const autoResize = () => {
     if (textareaRef.current) {
@@ -22,13 +57,29 @@ const HomePage: React.FC = () => {
     autoResize(); // Trigger resize on mount to ensure it adjusts if there is initial content
   }, []);
 
+  const { data, setData, post, processing, errors } = useForm({
+    content: '',
+  });
+
+  const handlePost: FormEventHandler = (e) => {
+    e.preventDefault();
+    post(route('post.store'), {
+      onError: (errors) => {
+        console.error('Error creating post:', errors);
+        // Handle errors here, e.g., show error messages
+      },
+    });
+  };
+
   return (
-    <Layout>
-      <div className="backdrop-blur-sm text-xl bg-card font-bold p-4 sticky top-0 border-b ">
+    <Layout
+      user={auth.user}>
+        <Head title="Home" />
+      <div className="z-50 backdrop-blur-sm text-center text-xl font-bold p-4 sticky top-0 border-b">
         Home
       </div>
-      <div className="bg-card h-full text-card-foreground shadow-lg">
-        <div className='flex border-b mb-4 p-4'>
+      <div className="text-card-foreground">
+        <div className='flex border-b p-4'>
           <Avatar className='mr-2'>
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>CN</AvatarFallback>
@@ -36,6 +87,8 @@ const HomePage: React.FC = () => {
           <div className='w-full'>
             <textarea
               ref={textareaRef}
+              value={data.content}
+              onChange={(e) => setData('content', e.target.value)}
               onInput={autoResize} // Listen for input changes to adjust height
               className="resize-none w-full text-xl border-0 bg-transparent focus:ring-0 dark:text-white dark:placeholder-gray-400"
               placeholder="What's happening?"
@@ -43,47 +96,56 @@ const HomePage: React.FC = () => {
             />
             <div className="flex justify-between items-center mt-2 px-3">
               <div>
-                <input type="file" id="file-input" className="hidden" />
+                <input
+                  type="file"
+                  id="file-input"
+                  className="hidden"
+                  onChange={(e) => {
+                    // Handle file input change if needed
+                    console.log(e.target.files);
+                  }}
+                />
                 <label htmlFor="file-input" className="cursor-pointer">
                   <FontAwesomeIcon className='text-xl' icon={faPhotoFilm} />
                 </label>
               </div>
-              <Button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-                Tweet
+              <Button
+                onClick={handlePost}
+                disabled={processing}
+              >
+                Post
               </Button>
             </div>
+            {errors.content && <div className="text-red-500 mt-2">{errors.content}</div>}
           </div>
         </div>
-        <div className='flex border-b p-4'>
-          <Avatar className='mr-2'>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-
-          <div className='w-full'>
-            <div className='flex justify-between items-center'>
-              <div className='flex space-x-1'>
-                <h2 className="font-bold">John Doe</h2>
-                <h5 >@Doe</h5>
+        {posts.map((post) => (
+          <div key={post.updated_at} className='flex border-b p-4 transition hover:bg-background/60'>
+            <Avatar className='mr-2'>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <div className='w-full'>
+              <div className='flex justify-between items-center'>
+                <div className='flex space-x-1'>
+                  <h2 className="font-bold">{post.name}</h2>
+                  <h5>@{post.handle}</h5>
+                  <p> ~ {format(new Date(post.updated_at), 'HH:mm dd-MM-yyyy')}</p>
+                </div>
+                <div>
+                  <Button variant='ghost'>
+                    <FontAwesomeIcon className='text-xl' icon={faEllipsis} />
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Button variant='ghost' className=''>
-                  <FontAwesomeIcon className='text-xl' icon={faEllipsis} />
-                </Button>
+              <p>{post.content}</p>
+              <div className='flex space-x-4 mt-4 text-lg'>
+                <FontAwesomeIcon icon={faHeart} className='text-pink-500' />
               </div>
-            </div>
-            <p>Just posted a new project on GitHub! Check it out #NextJS #TypeScript</p>
-            <div className='flex space-x-4 mt-4 text-xl'>
-            <FontAwesomeIcon icon={faHeart} />
-            <FontAwesomeIcon icon={faBookmark} />
-            <FontAwesomeIcon icon={faShareFromSquare} />
             </div>
           </div>
-
-        </div>
+        ))}
       </div>
     </Layout>
   );
 };
-
-export default HomePage;
