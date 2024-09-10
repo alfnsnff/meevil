@@ -1,49 +1,48 @@
-# Stage 1: Install Node.js dependencies and build assets
-FROM node:18-alpine as node_builder
+# Use a lightweight base image
+FROM php:8.2-apache
 
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    curl \
+    wget \
+    git \
+    sudo \
+    libpq-dev \
+    postgresql-client \
+    libpng-dev \
+    libjpeg-dev \
+    mysql-client
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Create a workspace directory
 WORKDIR /app
 
-# Copy only the necessary files for Node.js
-COPY package*.json ./
+# Copy the composer.json file
+COPY composer.json .
 
-# Install Node.js dependencies (React, TypeScript)
+# Install dependencies
+RUN composer install --no-interaction --no-dev
+
+# Copy the rest of the application
+COPY . .
+
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
+
+# Install npm dependencies
+WORKDIR /app/frontend
 RUN npm install
 
-# Copy the rest of the project files and build the assets
-COPY . .
+# Build the frontend assets
 RUN npm run build
 
-# Stage 2: Install PHP dependencies and set up Laravel
-FROM php:8.2-fpm-alpine
+# Configure Apache
+COPY apache2.conf /etc/apache2/sites-available/000-default.conf
 
-# Install system dependencies, PHP extensions, and Composer dependencies
-RUN apk add --no-cache nginx curl git bash \
-    libpng-dev libjpeg-turbo-dev libwebp-dev libfreetype-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql gd \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy the composer files and install PHP dependencies
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader
-
-# Copy the application code
-COPY . .
-
-# Copy the built assets from node_builder stage
-COPY --from=node_builder /app/public /var/www/html/public
-
-# Set proper permissions for Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Copy Nginx config and set permissions
-COPY ./docker/nginx.conf /etc/nginx/nginx.conf
-
-# Expose the port that Nginx will use
-EXPOSE 8080
-
-# Start PHP-FPM and Nginx
-CMD ["sh", "-c", "php-fpm & nginx -g 'daemon off;'"]
+# Start Apache
+CMD ["apache2ctl", "-D", "FOREGROUND"]
