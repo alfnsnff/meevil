@@ -1,12 +1,14 @@
 FROM node:18-alpine as builder
 
-WORKDIR /app
-
 COPY package*.json ./
+
+WORKDIR /app
 
 RUN npm install
 
 COPY . .
+
+COPY .env .env.example
 
 RUN npm run build
 

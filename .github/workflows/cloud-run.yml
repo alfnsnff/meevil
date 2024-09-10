@@ -13,6 +13,12 @@ jobs:
     name: Setup Build and Deploy
     runs-on: ubuntu-latest
 
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REPO_NAME: ${{ github.event.repository.name }}
+      REGION: ${{ secrets.REGION }}
+      GITHUB_SHA: ${{ github.sha }}
+
     steps:
     # Checkout the repository
     - name: Checkout code
@@ -29,23 +35,11 @@ jobs:
       run: gcloud auth configure-docker
 
     # Build and push Docker image to Google Container Registry
-    - name: Build and push to GCR
-      run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/meevil .
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/meevil
+    - name: Build and tag the docker image
+      run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA
 
-    # Deploy to Cloud Run
-    - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy meevil \
-        --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/meevil \
-        --region ${{ secrets.GCP_REGION }} \
-        --platform managed \
-        --quiet
+    - name: Push the image to GCR
+      run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA
 
-    - name: IAM Policy Binding Setup
-      run: |
-        gcloud run services add-iam-policy-binding meevil \
-        --member="allUsers" \
-        --role="roles/run.invoker" \
-        --region ${{ secrets.GCP_REGION }}
+    - name: Deploy Deploy to Cloud Run
+      run: gcloud run deploy $REPO_NAME --image=gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA --region=$REGION --platform=managed --quiet
