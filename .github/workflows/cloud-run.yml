@@ -43,8 +43,9 @@ jobs:
 
     # Deploy to Cloud Run
     - name: Deploy to Cloud Run
-      run: gcloud run deploy ${{ github.event.repository.name }} \
-        --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.event.repository.name }}:${{ github.sha }} \
-        --region=${{ secrets.GCP_REGION }} \
-        --platform=managed \
-        --quiet
+      run: |
+        gcloud run deploy "${{ github.event.repository.name }}" \
+          --image "gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.event.repository.name }}:${{ github.sha }}" \
+          --region "${{ secrets.GCP_REGION }}" \
+          --platform managed \
+          --quiet
