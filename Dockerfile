@@ -1,42 +1,28 @@
-# Use the official PHP image with FPM
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
-# Install necessary system packages and PHP extensions
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    curl \
-    libpng-dev \
-    libzip-dev \
-    zip \
-    npm \
-    nginx \
-    && docker-php-ext-install zip pdo pdo_mysql
+# Install dependencies
+RUN apk add --no-cache \
+    composer \
+    nodejs \
+    npm
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copy composer.json and composer.lock
+COPY composer.json composer.lock ./
 
-# Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
+# Install dependencies
+RUN composer install
+
+# Copy the rest of your project
+COPY . .
 
 # Set working directory
 WORKDIR /app
 
-# Install PHP dependencies with Composer
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Install Node.js dependencies
+RUN npm install
 
-# Copy Laravel project files
-COPY . .
+# Expose ports
+EXPOSE 8000 3000
 
-# Install Node.js dependencies and build frontend
-RUN npm install && npm run build
-
-# Copy Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 8080
-EXPOSE 8080
-
-# Start PHP-FPM and Nginx
-CMD ["sh", "-c", "php-fpm & nginx -g 'daemon off;'"]
+# Define commands to run
+CMD ["sh", "-c", "npm run dev & php artisan serve"]
