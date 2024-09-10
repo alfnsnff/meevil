@@ -1,7 +1,7 @@
 FROM php:8.3-fpm-alpine
 
 # Install dependencies and PHP extensions
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     curl \
     git \
     make \
