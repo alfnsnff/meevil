@@ -1,4 +1,3 @@
-# Use a specific PHP image
 FROM php:8.3-fpm-alpine
 
 # Install dependencies and PHP extensions
@@ -10,7 +9,6 @@ RUN apk add --no-cache \
     postgresql-dev \
     nodejs \
     npm \
-    yarn \
     php8-gd \
     php8-pdo \
     php8-pdo_pgsql \
@@ -26,12 +24,11 @@ WORKDIR /app
 
 # Copy dependency files first
 COPY composer.json composer.lock ./
-COPY package.json yarn.lock ./
+COPY package.json ./
 
 # Install PHP and Node dependencies
 RUN composer install --no-interaction --no-ansi --optimize-autoloader
 RUN npm install
-RUN yarn install
 
 # Copy the application code
 COPY . .
