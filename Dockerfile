@@ -14,7 +14,6 @@ RUN composer install
 
 # Copy the rest of your project (excluding .env)
 COPY --from=none . .
-COPY --exclude=.env . .  # Alternative way to exclude .env
 
 # Set working directory
 WORKDIR /app
