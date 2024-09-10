@@ -11,44 +11,49 @@ RUN apt-get update && apt-get install -y \
     git \
     sudo \
     libpq-dev \
-    postgresql-client \
     libpng-dev \
     libjpeg-dev \
-    mysql-client
+    mysql-client --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Create a workspace directory
+# Set working directory for application
 WORKDIR /app
 
-# Copy the composer.json file
-COPY composer.json .
-
-# Install dependencies
-RUN composer install --no-interaction --no-dev
+# Copy composer.json and install dependencies without dev packages
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --no-dev --optimize-autoloader
 
 # Copy the rest of the application
 COPY . .
 
-ENV DB_HOST="silang-c241-ps520:asia-southeast1:meevil"
-ENV DB_PORT="3306"
-ENV DB_DATABASE="your-mysql-database"
-ENV DB_USERNAME="root"
-ENV DB_PASSWORD="-JTsdI/ly"">kY%{"
+# Set environment variables (avoid hardcoding sensitive data in Dockerfile)
+ENV DB_HOST="34.126.103.119" \
+    DB_PORT="3306" \
+    DB_DATABASE="meevil" \
+    DB_USERNAME="root" \
+    DB_PASSWORD="-JTsdI/ly\"\">kY%{"
 
 # Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install npm dependencies
+# Set working directory for frontend and install npm dependencies
 WORKDIR /app/frontend
-RUN npm install
+COPY frontend/package*.json ./
+RUN npm install --production
 
 # Build the frontend assets
 RUN npm run build
 
 # Configure Apache
 COPY apache2.conf /etc/apache2/sites-available/000-default.conf
+
+# Expose the default HTTP port
+EXPOSE 80
 
 # Start Apache
 CMD ["apache2ctl", "-D", "FOREGROUND"]
