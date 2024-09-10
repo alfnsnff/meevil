@@ -16,17 +16,19 @@ RUN npm run build
 # Stage 2: Install PHP dependencies and set up Laravel
 FROM php:8.2-fpm-alpine
 
-# Install system dependencies, PHP extensions, and Composer
-RUN apk add --no-cache nginx curl \
-    && docker-php-ext-install pdo_mysql
+# Install system dependencies, PHP extensions, and Composer dependencies
+RUN apk add --no-cache nginx curl git bash \
+    libpng-dev libjpeg-turbo-dev libwebp-dev libfreetype-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install pdo_mysql gd \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
 WORKDIR /var/www/html
 
 # Copy the composer files and install PHP dependencies
 COPY composer.json composer.lock ./
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader
 
 # Copy the application code
 COPY . .
