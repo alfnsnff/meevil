@@ -16,7 +16,7 @@ jobs:
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       REPO_NAME: ${{ github.event.repository.name }}
-      REGION: ${{ secrets.REGION }}
+      REGION: ${{ secrets.GCP_REGION }}
       GITHUB_SHA: ${{ github.sha }}
 
     steps:
