@@ -1,5 +1,3 @@
-FROM php:8.2-fpm
-
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libpq-dev \
@@ -12,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Node.js and npm (version can be adjusted as needed)
+# Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
@@ -23,8 +21,12 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 COPY package.json ./
 
+# Add debugging commands
+RUN composer --version
+RUN php --version
+
 # Install PHP and Node dependencies
-RUN composer install --no-interaction --no-ansi --optimize-autoloader
+RUN composer install --no-interaction --no-ansi --optimize-autoloader || { echo 'Composer install failed'; exit 1; }
 RUN npm install
 
 # Copy the application code
