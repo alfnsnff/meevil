@@ -1,6 +1,7 @@
+# Use a specific PHP image
 FROM php:8.3-fpm-alpine
 
-# Install dependencies
+# Install dependencies and PHP extensions
 RUN apk add --no-cache \
     curl \
     git \
@@ -9,7 +10,13 @@ RUN apk add --no-cache \
     postgresql-dev \
     nodejs \
     npm \
-    yarn
+    yarn \
+    php8-gd \
+    php8-pdo \
+    php8-pdo_pgsql \
+    php8-json \
+    php8-openssl \
+    php8-mbstring
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -17,10 +24,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Set working directory
 WORKDIR /app
 
-# Copy composer.json and package.json
-COPY composer.json package.json ./
+# Copy dependency files first
+COPY composer.json composer.lock ./
+COPY package.json yarn.lock ./
 
-# Install dependencies
+# Install PHP and Node dependencies
 RUN composer install --no-interaction --no-ansi --optimize-autoloader
 RUN npm install
 RUN yarn install
