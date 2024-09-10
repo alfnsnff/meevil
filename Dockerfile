@@ -31,6 +31,12 @@ RUN composer install --no-interaction --no-dev
 # Copy the rest of the application
 COPY . .
 
+ENV DB_HOST="silang-c241-ps520:asia-southeast1:meevil"
+ENV DB_PORT="3306"
+ENV DB_DATABASE="your-mysql-database"
+ENV DB_USERNAME="root"
+ENV DB_PASSWORD="-JTsdI/ly"">kY%{"
+
 # Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
