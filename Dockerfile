@@ -13,7 +13,7 @@ COPY composer.json composer.lock ./
 RUN composer install
 
 # Copy the rest of your project (excluding .env)
-COPY --from=none . .
+COPY . .
 
 # Set working directory
 WORKDIR /app
