@@ -1,4 +1,6 @@
+# Use the official PHP image with FPM
 FROM php:8.2-fpm
+
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libpq-dev \
@@ -16,7 +18,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
 # Set working directory
-WORKDIR /app
+WORKDIR /var/www/html
 
 # Copy dependency files first
 COPY composer.json composer.lock ./
@@ -43,5 +45,5 @@ ENV DB_HOST="34.126.103.119" \
 # Expose the application port
 EXPOSE 8000
 
-# Start the application
-CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
+# Start the PHP-FPM server
+CMD ["php-fpm"]
