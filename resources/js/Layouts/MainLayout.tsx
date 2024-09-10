@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Dropdown from '@/Components/Dropdown';
 import { User } from '@/types';
-// import { faHouse } from '@fortawesome/free-solid-svg-icons';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
-// import { faBell } from '@fortawesome/free-solid-svg-icons/faBell';
-// import { Link } from '@inertiajs/react';
+import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
+import { faBell } from '@fortawesome/free-solid-svg-icons/faBell';
+import { Link } from '@inertiajs/react';
 
 
 export default function Layout({ user, children }: PropsWithChildren<{ user: User}>) {
@@ -40,19 +40,19 @@ export default function Layout({ user, children }: PropsWithChildren<{ user: Use
             </Dropdown.Content>
           </Dropdown>
           <ul className='pl-16'>
-            {/* <Link href="/home">
+            <Link href="/home">
               <li className="py-2 transition px-4 hover:bg-gray-200 cursor-pointer rounded-full font-bold">
                 <FontAwesomeIcon icon={faHouse} className='mr-2' />
                 Home
               </li>
-            </Link> */}
-            {/* <Link href="/explore">
+            </Link>
+            <Link href="/explore">
               <li className="py-2 transition px-4 hover:bg-gray-200 cursor-pointer rounded-full ">
                 <FontAwesomeIcon icon={faMagnifyingGlass} className='mr-2' />
                 Explore
               </li>
             </Link>
-            <Link href="/favorites">
+            {/* <Link href="/favorites">
               <li className="py-2 transition px-4 hover:bg-gray-200 cursor-pointer rounded-full ">
                 <FontAwesomeIcon icon={faBell} className='mr-2' />
                 Favorites

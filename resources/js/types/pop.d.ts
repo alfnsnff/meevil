@@ -3,4 +3,5 @@ export interface Post {
   name: string;
   handle: string;
   content: string;
+  file_path: string;
 }

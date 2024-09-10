@@ -5,7 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
-.env.example
+.env
 .env.backup
 .env.production
 .phpactor.json
@@ -18,3 +18,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+BUCKET_SA_KEY.json
+BUCKET_SA_KEY.json:Zone.Identifier

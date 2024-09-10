@@ -48,4 +48,17 @@ jobs:
           --image "gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.event.repository.name }}:${{ github.sha }}" \
           --region "${{ secrets.GCP_REGION }}" \
           --platform managed \
+          --update-env-vars \
+            APP_NAME=Meevil,\
+            APP_ENV=production,\
+            APP_KEY=${{ secrets.APP_KEY }},\
+            APP_DEBUG=false,\
+            APP_URL=https://meevil-838039345458.asia-southeast1.run.app,\
+            DB_CONNECTION=sqlite,\
+            DB_DATABASE=/app/storage/database/database.sqlite,\
+            CACHE_DRIVER=file,\
+            SESSION_DRIVER=file,\
+            QUEUE_CONNECTION=sync,\
+            LOG_CHANNEL=stack,\
+            FILESYSTEM_DRIVER=local \
           --quiet
