@@ -17,7 +17,6 @@ jobs:
       PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       REPO_NAME: ${{ github.event.repository.name }}
       REGION: ${{ secrets.GCP_REGION }}
-      GITHUB_SHA: ${{ github.sha }}
 
     steps:
     # Checkout the repository
@@ -36,10 +35,10 @@ jobs:
 
     # Build and push Docker image to Google Container Registry
     - name: Build and tag the docker image
-      run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA
+      run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME
 
     - name: Push the image to GCR
-      run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA
+      run: docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME
 
     - name: Deploy Deploy to Cloud Run
-      run: gcloud run deploy $REPO_NAME --image=gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA --region=$REGION --platform=managed --quiet
+      run: gcloud run deploy $REPO_NAME --image=gcr.io/$PROJECT_ID/$REPO_NAME --region=$REGION --platform=managed --quiet
