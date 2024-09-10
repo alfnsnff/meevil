@@ -44,6 +44,15 @@ return [
             'throw' => false,
         ],
 
+        'gcs' => [
+            'driver' => 'gcs',
+            'project_id' => env('GOOGLE_CLOUD_PROJECT_ID'),
+            'key_file' => env('GOOGLE_CLOUD_KEY_FILE'), // Path to your service account JSON file
+            'bucket' => env('GOOGLE_CLOUD_BUCKET'),
+            'url' => env('GOOGLE_CLOUD_URL'), // Optional
+            'endpoint' => env('GOOGLE_CLOUD_ENDPOINT'), // Optional
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
